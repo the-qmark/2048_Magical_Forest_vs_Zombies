@@ -9,6 +9,8 @@ public class Field : MonoBehaviour
     [SerializeField] private Cell _cellPrefab;
     [Space]
     [SerializeField] private int _maxCountOfMoves;
+    [Space]
+    [SerializeField] private UnitsSpawner _unitsSpawner;
     
     private int _currentCountOfMoves;
 
@@ -17,9 +19,11 @@ public class Field : MonoBehaviour
     private Cell[,] _cells;
 
     void Start()
-    { 
-
+    {
+        _currentCountOfMoves = _maxCountOfMoves;
         GenerateCells();
+        _unitsSpawner.SpawnRandomUnit();
+        
     }
 
     
@@ -48,6 +52,7 @@ public class Field : MonoBehaviour
                 Cell newCell = Instantiate(_cellPrefab, pos, Quaternion.identity, transform);
                 _cells[row, column] = newCell;
 		        newCell.name = $"[{row};{column}]";
+                newCell.Merge += OnCellMerge;
 		        posX += sizeOfCell + _space;
 	        }
             posX = startPosX;
@@ -92,6 +97,9 @@ public class Field : MonoBehaviour
         {
             return;
         }
+
+        if (_unitsSpawner.MovingUnits != 0)
+            return;
 
         if (direction.x > 0) // вправо
         {
@@ -268,7 +276,7 @@ public class Field : MonoBehaviour
 
         foreach (Cell _cells in _cells)
         {
-            _cells.IsMerge = false;
+            //_cells.IsMerge = false;
         }
 
         _isMove = false;
@@ -277,5 +285,10 @@ public class Field : MonoBehaviour
     private void ResetCountOfMoves()
     {
         _currentCountOfMoves = _maxCountOfMoves;
+    }
+
+    private void OnCellMerge(Cell cell, int level)
+    {
+        _unitsSpawner.SpawnNextUnit(cell, level);
     }
 }
