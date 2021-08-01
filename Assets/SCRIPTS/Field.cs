@@ -18,19 +18,14 @@ public class Field : MonoBehaviour
 
     private Cell[,] _cells;
 
-    void Start()
+
+    private void Start()
     {
         _currentCountOfMoves = _maxCountOfMoves;
         GenerateCells();
-        _unitsSpawner.SpawnRandomUnit();
-        
+        _unitsSpawner.SpawnRandomUnit(); 
     }
 
-    
-    void Update()
-    {
-        
-    }
 
     private void GenerateCells()
     {
@@ -271,12 +266,6 @@ public class Field : MonoBehaviour
                 }
 
             }
-        }
-
-
-        foreach (Cell _cells in _cells)
-        {
-            //_cells.IsMerge = false;
         }
 
         _isMove = false;

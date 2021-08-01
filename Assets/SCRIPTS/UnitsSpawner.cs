@@ -15,11 +15,13 @@ public class UnitsSpawner : MonoBehaviour
 
     public int MovingUnits { get => _movingUnits; private set => _movingUnits = value; }
 
+
     private void Awake()
     {
         if (Self == null)
             Self = this;
     }
+
 
     public void SpawnRandomUnit()
     {
@@ -42,6 +44,7 @@ public class UnitsSpawner : MonoBehaviour
         }
     }
 
+
     public void SpawnNextUnit(Cell cell, int level)
     {
         _newUnit = cell.SpawnUnit(_unitsContainer.GetUnit(level+1));
@@ -51,10 +54,12 @@ public class UnitsSpawner : MonoBehaviour
         _newUnit.Die += OnUnitDie;
     }
 
+
     private void OnUnitMovingStart()
     {
         _movingUnits++;
     }
+
 
     private void OnUnitMovingEnd()
     {

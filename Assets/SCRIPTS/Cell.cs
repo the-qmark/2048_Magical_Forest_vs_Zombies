@@ -5,21 +5,15 @@ using UnityEngine.Events;
 
 public class Cell : MonoBehaviour
 {
+    [SerializeField] private List<Unit> _units = new List<Unit>();
+
+    public event UnityAction<Cell, int> Merge;
     public bool IsEmpty { get => _units.Count == 0; private set => IsEmpty = value; }
     public bool IsMerge { get => _units.Count == 2; private set => IsMerge = value; }
     public int UnitLevel { get => _units.Count == 0 ? 0 : _units[0].Level; private set => UnitLevel = value; }
 
-    [SerializeField] private List<Unit> _units = new List<Unit>();
 
-    public event UnityAction<Cell, int> Merge;
-
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (IsEmpty)
         {
@@ -31,22 +25,16 @@ public class Cell : MonoBehaviour
         }
     }
 
+
     public Unit SpawnUnit(Unit unitForSpawn)
     {
-        if (unitForSpawn == null)
-            Debug.LogWarning("NULL");
-
         Unit spawnedUnit = Instantiate(unitForSpawn, transform.position, Quaternion.identity);
-
-        if (spawnedUnit == null)
-            Debug.LogWarning("NULL2");
-
         spawnedUnit.SetParentCell(this);
-
         AddUnit(spawnedUnit);
 
         return spawnedUnit;
     }
+
 
     public void MoveUnit(Cell cellToMove)
     {
@@ -58,13 +46,13 @@ public class Cell : MonoBehaviour
         _units.Clear();
     }
 
+
     private void AddUnit(Unit newUnit)
     {
         _units.Add(newUnit);
 
         if (_units.Count == 2)
         {
-            //IsMerge = true;
             _units[1].MoveEnd += DoMerge;
         }
         else if (_units.Count > 2) /// DELETE??
@@ -72,6 +60,7 @@ public class Cell : MonoBehaviour
             Debug.LogWarning("Something go wrong!!!!!!!!!!!!!!!!!!!!!!!");
         }
     }
+
 
     private void DoMerge()
     {
