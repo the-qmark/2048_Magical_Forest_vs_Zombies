@@ -7,6 +7,12 @@ public class Field : MonoBehaviour
     [SerializeField] private int _size;
     [SerializeField] private float _space;
     [SerializeField] private Cell _cellPrefab;
+    [Space]
+    [SerializeField] private int _maxCountOfMoves;
+    
+    private int _currentCountOfMoves;
+
+    private bool _isMove;
 
     private Cell[,] _cells;
 
@@ -47,5 +53,229 @@ public class Field : MonoBehaviour
             posX = startPosX;
             posZ -= (sizeOfCell + _space);
         }
+    }
+
+    public List<Cell> GetRandomEmptyCells()
+    {
+        List<Cell> allEmptyCells = new List<Cell>();
+
+        foreach (Cell cell in _cells)
+            if (cell.IsEmpty)
+                allEmptyCells.Add(cell);
+
+        List<Cell> emptyCellsForSpawn = new List<Cell>();
+
+        if (allEmptyCells.Count == 1)
+        {
+            emptyCellsForSpawn.Add(allEmptyCells[0]);
+            return emptyCellsForSpawn;
+        }
+        else if (allEmptyCells.Count > 1)
+        {
+            int rnd = Random.Range(0, allEmptyCells.Count);
+            emptyCellsForSpawn.Add(allEmptyCells[rnd]);
+            allEmptyCells.RemoveAt(rnd);
+            rnd = Random.Range(0, allEmptyCells.Count);
+            emptyCellsForSpawn.Add(allEmptyCells[rnd]);
+
+            return emptyCellsForSpawn;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void Move(Vector2 direction)
+    {
+        if (_currentCountOfMoves == 0)
+        {
+            return;
+        }
+
+        if (direction.x > 0) // вправо
+        {
+            for (int rowIndex = 0; rowIndex < _size; rowIndex++) // идет свеху вниз
+            {
+                for (int columnIndex = _size - 2; columnIndex >= 0; columnIndex--) // 2 1 0
+                {
+                    if (!_cells[rowIndex, columnIndex].IsEmpty)
+                    {
+                        int nextCol = columnIndex;
+
+                        for (int colDelta = columnIndex + 1; colDelta < _size; colDelta++)
+                        {
+                            if (_cells[rowIndex, colDelta].IsEmpty)
+                            {
+                                nextCol = colDelta;
+                            }
+                            else if (_cells[rowIndex, colDelta].UnitLevel == _cells[rowIndex, columnIndex].UnitLevel && !_cells[rowIndex, colDelta].IsMerge)
+                            {
+                                nextCol = colDelta;
+                                break;
+                            }
+                            else if (!_cells[rowIndex, colDelta].IsEmpty)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (nextCol != columnIndex)
+                        {
+                            _cells[rowIndex, columnIndex].MoveUnit(_cells[rowIndex, nextCol]);
+
+                            if (!_isMove)
+                            {
+                                _currentCountOfMoves--;
+                                _isMove = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (direction.x < 0) // влево
+        {
+            for (int rowIndex = 0; rowIndex < _size; rowIndex++) // идет свеху вниз
+            {
+                for (int columnIndex = 1; columnIndex < _size; columnIndex++) // 1 2 3
+                {
+                    if (!_cells[rowIndex, columnIndex].IsEmpty)
+                    {
+                        int nextCol = columnIndex;
+
+                        for (int colDelta = columnIndex - 1; colDelta >= 0; colDelta--)
+                        {
+                            if (_cells[rowIndex, colDelta].IsEmpty)
+                            {
+                                nextCol = colDelta;
+                            }
+                            else if (_cells[rowIndex, colDelta].UnitLevel == _cells[rowIndex, columnIndex].UnitLevel && !_cells[rowIndex, colDelta].IsMerge)
+                            {
+                                nextCol = colDelta;
+                                break;
+                            }
+                            else if (!_cells[rowIndex, colDelta].IsEmpty)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (nextCol != columnIndex)
+                        {
+                            _cells[rowIndex, columnIndex].MoveUnit(_cells[rowIndex, nextCol]);
+
+                            if (!_isMove)
+                            {
+                                _currentCountOfMoves--;
+                                _isMove = true;
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (direction.y > 0) // вверх
+        {
+            for (int rowIndex = 1; rowIndex < _size; rowIndex++) // идет свеху вниз 1 2 3
+            {
+                for (int columnIndex = 0; columnIndex < _size; columnIndex++) // 
+                {
+                    if (!_cells[rowIndex, columnIndex].IsEmpty)
+                    {
+                        int nextRow = rowIndex;
+
+                        for (int rowDelta = rowIndex - 1; rowDelta >= 0; rowDelta--)
+                        {
+                            if (_cells[rowDelta, columnIndex].IsEmpty)
+                            {
+                                nextRow = rowDelta;
+                            }
+                            else if (_cells[rowDelta, columnIndex].UnitLevel == _cells[rowIndex, columnIndex].UnitLevel && !_cells[rowDelta, columnIndex].IsMerge)
+                            {
+                                nextRow = rowDelta;
+                                break;
+                            }
+                            else if (!_cells[rowDelta, columnIndex].IsEmpty)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (nextRow != rowIndex)
+                        {
+                            _cells[rowIndex, columnIndex].MoveUnit(_cells[nextRow, columnIndex]);
+                            if (!_isMove)
+                            {
+                                _currentCountOfMoves--;
+                                _isMove = true;
+
+                            }
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+        if (direction.y < 0) // вниз
+        {
+            for (int rowIndex = _size - 2; rowIndex >= 0; rowIndex--) // идет сниху вверх 2 1 0
+            {
+                for (int columnIndex = 0; columnIndex < _size; columnIndex++) // 
+                {
+                    if (!_cells[rowIndex, columnIndex].IsEmpty)
+                    {
+                        int nextRow = rowIndex;
+
+                        for (int rowDelta = rowIndex + 1; rowDelta < _size; rowDelta++)
+                        {
+                            if (_cells[rowDelta, columnIndex].IsEmpty)
+                            {
+                                nextRow = rowDelta;
+                            }
+                            else if (_cells[rowDelta, columnIndex].UnitLevel == _cells[rowIndex, columnIndex].UnitLevel && !_cells[rowDelta, columnIndex].IsMerge)
+                            {
+                                nextRow = rowDelta;
+                                break;
+                            }
+                            else if (!_cells[rowDelta, columnIndex].IsEmpty)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (nextRow != rowIndex)
+                        {
+                            _cells[rowIndex, columnIndex].MoveUnit(_cells[nextRow, columnIndex]);
+
+                            if (!_isMove)
+                            {
+                                _currentCountOfMoves--;
+                                _isMove = true;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+
+        foreach (Cell _cells in _cells)
+        {
+            _cells.IsMerge = false;
+        }
+
+        _isMove = false;
+    }
+
+    private void ResetCountOfMoves()
+    {
+        _currentCountOfMoves = _maxCountOfMoves;
     }
 }
