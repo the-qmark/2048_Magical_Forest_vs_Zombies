@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class InputArrow : MonoBehaviour
 {
@@ -30,6 +31,12 @@ public class InputArrow : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             _field.Move(Vector2.left);
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(0);
             return;
         }
 
